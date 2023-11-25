@@ -6,7 +6,7 @@ const {Contacts} = require("../models");
 module.exports = class extends BaseService {
   constructor() {
     super();
-    this.cotactsModel = Contacts
+    this.contactsModel = Contacts
   }
 
   async create(req) {
@@ -17,7 +17,7 @@ module.exports = class extends BaseService {
         phone_1, phone_2, email, address, facebook, instagram
       }
 
-      const contacts = await this.cotactsModel.create(params);
+      const contacts = await this.contactsModel.create(params);
 
       return this.response({
         statusCode: 201,
@@ -36,7 +36,7 @@ module.exports = class extends BaseService {
       const { id } = req.params;
 
       if(id) {
-        const contacts = await this.cotactsModel.findOne({ where: { id } } );
+        const contacts = await this.contactsModel.findOne({ where: { id } } );
 
         if(!contacts) {
           return this.response({
@@ -63,6 +63,21 @@ module.exports = class extends BaseService {
     }
   }
 
+  async showAll(req) {
+    try {
+
+      const contacts = await this.contactsModel.findAll();
+
+      return this.response({
+        data: {
+          contacts: contacts[0]
+        }
+      });
+    } catch(error) {
+      return this.serverErrorResponse(error);
+    }
+  }
+
   async update(req) {
     try {
       const { id, phone_1, phone_2, email, address, facebook, instagram } = req.body;
@@ -76,9 +91,9 @@ module.exports = class extends BaseService {
         });
       }
 
-      const collaborator = await this.cotactsModel.findOne({ where: { id } } );
+      const collaborator = await this.contactsModel.findOne({ where: { id } } );
 
-      await this.cotactsModel.update({
+      await this.contactsModel.update({
         ...collaborator,
         phone_1,
         phone_2,

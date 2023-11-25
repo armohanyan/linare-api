@@ -5,6 +5,10 @@ const contactsController = new ContactsController();
 const router = Router();
 
 router.get(
+    "/",
+    contactsController.show.bind(contactsController)
+);
+router.get(
     "/:id",
     contactsController.show.bind(contactsController)
 );

@@ -4,6 +4,12 @@ const collaboratorsController = new CollaboratorsController();
 
 const router = Router();
 
+
+router.get(
+    "/",
+    collaboratorsController.show.bind(collaboratorsController)
+);
+
 router.get(
     "/:id",
     collaboratorsController.show.bind(collaboratorsController)

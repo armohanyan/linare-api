@@ -5,6 +5,11 @@ const testimonialsController = new TestimonialsController();
 const router = Router();
 
 router.get(
+    "/",
+    testimonialsController.show.bind(testimonialsController)
+);
+
+router.get(
   "/:id",
     testimonialsController.show.bind(testimonialsController)
 );

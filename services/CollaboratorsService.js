@@ -30,6 +30,22 @@ module.exports = class extends BaseService {
     }
   }
 
+
+  async showAll(req) {
+    try {
+
+      const collaborators = await this.collaboratorsModel.findAll();
+
+      return this.response({
+        data: {
+          collaborators
+        }
+      });
+    } catch(error) {
+      return this.serverErrorResponse(error);
+    }
+  }
+
   async show(req) {
     try {
       const { id } = req.params;

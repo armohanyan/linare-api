@@ -45,10 +45,8 @@ module.exports = class extends BaseService {
       const { id } = req.params;
 
       if(id) {
-        console.log(id)
         const testimonial = await this.testimonialsModel.findOne({ where: { id: id } } );
 
-        console.log(testimonial)
         if(!testimonial) {
           return this.response({
             status: false,
@@ -68,6 +66,21 @@ module.exports = class extends BaseService {
         status: false,
         statusCode: 400,
         message: 'Testimonial ID is required'
+      });
+    } catch(error) {
+      return this.serverErrorResponse(error);
+    }
+  }
+
+  async showAll(req) {
+    try {
+
+      const testimonials = await this.testimonialsModel.findAll();
+
+      return this.response({
+        data: {
+          testimonials
+        }
       });
     } catch(error) {
       return this.serverErrorResponse(error);
