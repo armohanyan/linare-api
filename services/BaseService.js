@@ -1,3 +1,4 @@
+const {validationResult} = require("express-validator");
 module.exports = class BaseService {
     response({
                  status = true,
@@ -12,6 +13,24 @@ module.exports = class BaseService {
             data,
             message,
             validationError
+        }
+    }
+
+    handleErrors(request) {
+        const { errors } = validationResult(request);
+
+        return {
+            hasErrors: errors && errors.length,
+            ...(errors && errors.length ? {
+                body: {
+                    success: false,
+                    statusCode: 400,
+                    validationError: {
+                        property: errors[0].path,
+                        message: errors[0].msg,
+                    }
+                }
+            } : {})
         }
     }
 

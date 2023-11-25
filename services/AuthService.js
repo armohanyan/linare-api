@@ -1,26 +1,30 @@
-const userModel = require('../../linare/node-vue-api/models/User');
 const MailService = require('./mailService');
 const bcrypt = require('bcrypt')
+const BaseService = require("./BaseService");
+const { Users } = require("../models");
+const {createToken, verifyToken} = require("../common/token");
 const mailService = new MailService();
-const BaseService = require('../../linare/node-vue-api/services/BaseService');
-const { createToken, verifyToken } = require('../../linare/node-vue-api/common/token');
 
 module.exports = class AuthService extends BaseService {
 
   constructor() {
     super();
+    this.userModel = Users
+
   }
 
   async signUp(req) {
     try {
-      const { email, password, firstName, lastName } = req.body;
+      const { email, password, firstName, lastName, phone } = req.body;
 
       const err = this.handleErrors(req);
       if(err.hasErrors) {
         return err.body;
       }
 
-      const user = await userModel.findOne({ email }).exec();
+      const user = await this.userModel.findOne(
+    { where: { email } }
+      )
 
       if(user) {
         return this.response({
@@ -40,16 +44,19 @@ module.exports = class AuthService extends BaseService {
         }
       });
 
-      const createUser = await userModel.create({
+      const hashedPassword = await bcrypt.hash(password, 10)
+
+      const createUser = await this.userModel.create({
         confirmationToken,
         firstName,
         lastName,
-        password,
+        password: hashedPassword,
         email,
-        role: 'basic'
+        phone,
+        role: 'superAdmin'
       });
 
-      if(createUser) {
+      if (createUser) {
         const url = `verify-email?email=${email}&token=${confirmationToken}`;
 
         mailService.sendMail(
@@ -72,6 +79,7 @@ module.exports = class AuthService extends BaseService {
         });
       }
     } catch(error) {
+      console.log(error)
       return this.serverErrorResponse(error);
     }
   }
@@ -84,14 +92,15 @@ module.exports = class AuthService extends BaseService {
       }
 
       const { email, password } = req.body;
-
-      const user = await userModel.findOne({ email }).exec();
+      const user = await this.userModel.findOne(
+          { where: { email } }
+      )
 
       if(user && bcrypt.compareSync(password, user.password)) {
         if(user.isVerified) {
           const token = createToken({
             payload: {
-              id: user._id
+              id: user.id
             }
           });
 
@@ -133,7 +142,7 @@ module.exports = class AuthService extends BaseService {
     try {
       const { email } = req.body;
 
-      const user = await userModel.findOne({ email }).exec();
+      const user = await this.userModel.findOne({where: {email}});
 
       if(!user) {
         return this.response({
@@ -153,25 +162,28 @@ module.exports = class AuthService extends BaseService {
         }
       });
 
-      await userModel.updateOne({
-        email,
+      await this.userModel.update({
         confirmationToken
-      });
+      },  {
+        where: { email }
+      })
 
       const url = `verify-email?email=${email}&token=${confirmationToken}`;
 
-      // mailService.sendMail(
-      //   email,
-      //   url,
-      //   'Email verification',
-      //   'Please click to verify your email'
-      // );
+      mailService.sendMail(
+          email,
+          url,
+          'Email verification',
+          'Please click to verify your email'
+      );
+
 
       return this.response({
         message: 'Token was sent to email'
       });
 
     } catch(error) {
+      console.log(error)
       return this.serverErrorResponse(error);
     }
   }
@@ -183,9 +195,11 @@ module.exports = class AuthService extends BaseService {
         token &&
         verifyToken({ token, secret: process.env.JWT_EMAIL_SECRET })
       ) {
-        const isValidUser = await userModel.findOne({ email }).exec();
+        const isValidUser = await this.userModel.findOne(
+            { where: { email } }
+        )
 
-        if(!isValidUser) {
+        if (!isValidUser) {
           return this.response({
             statusCode: 404,
             status: false,
@@ -199,18 +213,15 @@ module.exports = class AuthService extends BaseService {
           });
         }
 
-        const user = await userModel
-          .findOne({
-            email,
-            confirmationToken: token
-          })
-          .exec();
-
-        await userModel.updateOne({
-          _id: user._id,
+        const user = await this.userModel.findOne(
+            { where: { email, confirmationToken: token } }
+        )
+        await this.userModel.update({
           isVerified: true,
           confirmationToken: null
-        });
+        },  {
+          where: { id: user.id }
+        })
 
         return this.response({
           message: 'Email successfully confirmed'
@@ -224,6 +235,7 @@ module.exports = class AuthService extends BaseService {
         });
       }
     } catch(error) {
+      console.log(error)
       return this.serverErrorResponse(error);
     }
   }
@@ -232,9 +244,11 @@ module.exports = class AuthService extends BaseService {
     try {
       const { email } = req.body;
 
-      const user = await userModel.findOne({ email }).exec();
+      const user = await this.userModel.findOne(
+          { where: { email } }
+      )
 
-      if(user) {
+      if (user) {
         const confirmationToken = createToken({
           payload: {
             email
@@ -247,17 +261,18 @@ module.exports = class AuthService extends BaseService {
 
         const url = `verify-email?email=${email}&token=${confirmationToken}`;
 
-        await userModel.updateOne({
-          email,
+        await this.userModel.update({
           confirmationToken
-        });
+        },  {
+          where: { email }
+        })
 
-        // mailService.sendMail(
-        //   email,
-        //   url,
-        //   'Email verification',
-        //   'Please click to verify your email'
-        // );
+        mailService.sendMail(
+          email,
+          url,
+          'Email verification',
+          'Please click to verify your email'
+        );
 
         return this.response({
           message: 'Token was sent to email'
@@ -278,9 +293,11 @@ module.exports = class AuthService extends BaseService {
   async verifyEmailOnResetPassword(req) {
     try {
       const { email } = req.body;
-      const user = await userModel.findOne({ email }).exec();
+      const user =await this.userModel.findOne(
+          { where: { email } }
+      )
 
-      if(!user) {
+      if (!user) {
         return this.response({
           status: false,
           statusCode: 404,
@@ -298,20 +315,21 @@ module.exports = class AuthService extends BaseService {
         }
       });
 
-      const updateUserConfirmationToken = await userModel.updateOne({
-        email,
+      const updateUserConfirmationToken =   await this.userModel.update({
         confirmationToken
-      });
+      },  {
+        where: { email }
+      })
 
-      if(updateUserConfirmationToken) {
+      if (updateUserConfirmationToken) {
         const url = `reset-password?email=${email}&token=${confirmationToken}`;
 
-        // mailService.sendMail(
-        //   email,
-        //   url,
-        //   'Reset Password',
-        //   'Please click to reset your password'
-        // );
+        mailService.sendMail(
+          email,
+          url,
+          'Reset Password',
+          'Please click to reset your password'
+        );
       }
 
       return this.response({
@@ -326,7 +344,8 @@ module.exports = class AuthService extends BaseService {
   async resetPassword(req) {
     try {
       const validationError = this.handleErrors(req);
-      if(validationError.hasErrors) {
+
+      if (validationError.hasErrors) {
         return validationError.body;
       }
 
@@ -338,11 +357,13 @@ module.exports = class AuthService extends BaseService {
         secret: process.env.JWT_PASSOWRD_RESET_SECRET
       });
 
-      if(isTokenValid) {
+      if (isTokenValid) {
         const { email } = isTokenValid;
-        const user = await userModel.findOne({ email });
+        const user = await this.userModel.findOne(
+                { where: { email } }
+        )
 
-        if(!user) {
+        if (!user) {
           return this.response({
             status: false,
             statusCode: 404,
@@ -350,13 +371,16 @@ module.exports = class AuthService extends BaseService {
           });
         }
 
-        const resetUserPassword = await userModel.updateOne({
-          email,
-          password,
-          confirmationToken: null
-        });
+        const hashedPassword = bcrypt.hash(password, 10)
 
-        if(resetUserPassword) {
+        const resetUserPassword = await this.userModel.update({
+          hashedPassword,
+          confirmationToken: null
+        },  {
+          where: { email }
+        })
+
+        if (resetUserPassword) {
           return this.response({
             status: false,
             statusCode: 200,

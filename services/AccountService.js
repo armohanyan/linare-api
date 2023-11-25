@@ -1,10 +1,12 @@
 const BaseService = require("./BaseService");
 const {verifyToken} = require("../common/token");
+const {Users} = require("../models");
 
 class AccountService extends BaseService {
 
   constructor() {
     super();
+    this.userModel = Users
   }
 
   async current(req) {
@@ -13,7 +15,6 @@ class AccountService extends BaseService {
         req?.cookies?.accessToken ||
         req?.headers?.authorization?.split(' ')[1] ||
         null;
-
       if (!token) {
         return this.response({
           status: false,
@@ -22,11 +23,13 @@ class AccountService extends BaseService {
         });
       }
       const isValidToken = verifyToken({ token });
-
+      console.log(isValidToken)
       if (isValidToken) {
         const userId = isValidToken.id;
 
-        const user = await userModel.findOne({ _id: userId }).exec();
+        const user = await this.userModel.findOne(
+            { where: { id: userId } }
+        )
 
         if (!user) {
           return this.response({
@@ -42,7 +45,7 @@ class AccountService extends BaseService {
               lastName: user.lastName,
               email: user.email,
               isVerified: user.isVerified,
-              role: user.isVerified
+              role: user.role
             }
           }
         });
@@ -54,6 +57,7 @@ class AccountService extends BaseService {
         message: 'Invalid or expire token'
       });
     } catch (error) {
+      console.log(error)
       return this.serverErrorResponse(error);
     }
   }

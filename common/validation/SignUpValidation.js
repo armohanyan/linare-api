@@ -19,6 +19,14 @@ module.exports = [
     .isLength({ min: 3 })
     .withMessage(validationMessage.min(3)),
 
+  body("phone")
+      .trim()
+      .not()
+      .isEmpty()
+      .withMessage(validationMessage.required)
+      .isLength({ min: 9 })
+      .withMessage(validationMessage.min(9)),
+
   body("email").trim().isEmail().withMessage(validationMessage.email),
 
   body("password")

@@ -1,37 +1,30 @@
 'use strict';
+/** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up(queryInterface, Sequelize) {
-    await queryInterface.createTable('News', {
+    await queryInterface.createTable('Contacts', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      authorId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Authors',
-          key: 'id',
-        },
-        onDelete: 'CASCADE',
-      },
-      title: {
+      email: {
         type: Sequelize.STRING
       },
-      text: {
-        type: Sequelize.TEXT
-      },
-      image: {
+      address: {
         type: Sequelize.STRING
       },
-      imageAlt: {
+      facebook: {
         type: Sequelize.STRING
       },
-      iframe: {
+      instagram: {
         type: Sequelize.STRING
       },
-      icon: {
+      phone_1: {
+        type: Sequelize.STRING
+      },
+      phone_2: {
         type: Sequelize.STRING
       },
       createdAt: {
@@ -45,6 +38,6 @@ module.exports = {
     });
   },
   async down(queryInterface, Sequelize) {
-    await queryInterface.dropTable('News');
+    await queryInterface.dropTable('Contacts');
   }
 };
