@@ -1,4 +1,4 @@
-const {Sequelize, News, Categories, Authors, News_Category} = require('../models')
+const {Sequelize, News, Categories, Authors, Products_Categories} = require('../models')
 const _ = require("lodash");
 const {paginate} = require("../helpers");
 
@@ -6,15 +6,17 @@ class CategoriesProvider {
 
     constructor() {}
 
-    async createCategoryWithRel(category, createdNewsId) {
+    async createCategoryWithRel(category, createdProductId) {
         const [findOrCreatedCategory] = await Categories.findOrCreate({
             where: {category},
-            defaults: {category: category.toLowerCase()}
+            defaults: { name: category.toLowerCase()}
         });
 
-        await News_Category.create({
-            newsId: createdNewsId,
-            categoryId: findOrCreatedCategory?.id
+        if (!findOrCreatedCategory) throw new Error("Category not found")
+
+        await Products_Categories.create({
+            productId: createdProductId,
+            categoryId: findOrCreatedCategory.id
         })
     }
 }

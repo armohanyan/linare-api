@@ -1,10 +1,10 @@
-const {Sequelize, News, Categories, Authors, News_Category, Products} = require('../models')
+const {Sequelize, Categories, Authors, Products_Category, Products} = require('../models')
 const {paginate} = require("../helpers");
 
-class NewsProvider {
+class ProductsProvider {
 
     async findAll({page, limit, where = null}) {
-        const response = await News.findAndCountAll({
+        const response = await Products.findAndCountAll({
             ...paginate({
                 currentPage: page,
                 pageSize: limit
@@ -13,24 +13,22 @@ class NewsProvider {
             order: [
                 ['createdAt', 'DESC']
             ],
-            attributes: ['id', 'title', 'text', 'image', 'icon', 'imageAlt', 'createdAt'],
+            attributes: ['id', 'title', 'description', 'images', 'price', 'createdAt'],
             include: [{
                 model: Categories,
                 as: 'categories',
-                attributes: ['id', 'category'],
+                attributes: ['id', 'name', 'description'],
                 through: {
                     attributes: []
                 }
-            }, {
-                model: Authors,
-                as: 'author'
             }
             ],
             through: {
                 attributes: []
             }
         })
-        response.news = response?.rows
+        response.products = response?.rows
+
         delete response.rows
 
         return response
@@ -39,17 +37,14 @@ class NewsProvider {
 
     async findById({id}) {
         return await Products.findByPk(id, {
-            attributes: ['id', 'title', 'text', 'image', 'createdAt', 'imageAlt'],
+            attributes:  ['id', 'title', 'description', 'images', 'price', 'createdAt'],
             include: [{
                 model: Categories,
                 as: 'categories',
-                attributes: ['id', 'category'],
+                attributes: ['id', 'name', 'description'],
                 through: {
                     attributes: []
                 }
-            }, {
-                model: Authors,
-                as: 'author'
             }
             ],
             through: {
@@ -58,22 +53,18 @@ class NewsProvider {
         })
     }
 
-    async findNewsByCategory({page, limit, category, include = true, attributes= ['id', 'title', 'text', 'image', 'createdAt']}) {
-        console.log(include)
+    async findProductsByCategory({page, limit, category, include = true, attributes=  ['id', 'title', 'description', 'images', 'price', 'createdAt']}) {
         const parsedRel = [{
             model: Categories,
             as: 'categories',
-            where: {category: category.toLowerCase()},
-            attributes: ['id', 'category'],
+            where: { category: category.toLowerCase() },
+            attributes: ['id', 'name', 'description'],
             through: {
                 attributes: []
             }
-        }, {
-            model: Authors,
-            as: 'author'
         }]
         
-        const response = await News.findAndCountAll({
+        const response = await Products.findAndCountAll({
             ...paginate({
                 currentPage: page,
                 pageSize: limit
@@ -88,11 +79,11 @@ class NewsProvider {
             }
         })
         
-        response.news = response?.rows
+        response.products = response?.rows
         delete response.rows
 
         if(!include) {
-            response.news.forEach(element => {
+            response.products.forEach(element => {
                 if (element.dataValues.categories)
                     delete element.dataValues.categories
                 if (element.dataValues.author) 
@@ -104,4 +95,4 @@ class NewsProvider {
     }
 }
 
-module.exports = NewsProvider
+module.exports = ProductsProvider
