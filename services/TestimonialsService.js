@@ -133,7 +133,7 @@ module.exports = class extends BaseService {
         })
       }
 
-      await this.newsModel.destroy({
+      await this.testimonialsModel.destroy({
         where: {id}
       })
 

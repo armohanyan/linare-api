@@ -57,7 +57,6 @@ class AccountService extends BaseService {
         message: 'Invalid or expire token'
       });
     } catch (error) {
-      console.log(error)
       return this.serverErrorResponse(error);
     }
   }

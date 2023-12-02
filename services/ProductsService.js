@@ -2,7 +2,7 @@ const BaseService = require('./BaseService')
 const StorageService = require('./StorageService')
 const CategoriesProvider = require('../provider/CategoriesProvider')
 const ProductsProvider = require('../provider/ProductsProvider')
-const {Sequelize, products, Products, Categories, Authors, products_Category, Views} = require('../models')
+const {Sequelize, Products, Categories, Authors, Products_Categories, Views} = require('../models')
 const {Op} = require("sequelize");
 const {getLastWeeksDate, getLastMonthDate, getPreviousDay} = require("../helpers");
 
@@ -13,12 +13,13 @@ class ProductsService extends BaseService {
         this.storageService = new StorageService()
         this.productsProvider = new ProductsProvider()
         this.categoriesModel = Categories
-        this.productsModel = products
+        this.productsModel = Products
+        this.productsCategoriesModel = Products_Categories
     }
 
     async create(req) {
         try {
-            const { title, description, price, categories  } = req.body
+            const { title, shortDescription, description, price, categories  } = req.body
             const parseCategories = Array.isArray(categories) ? categories : [categories]
 
             if (!parseCategories?.length)  {
@@ -36,16 +37,19 @@ class ProductsService extends BaseService {
             const createdProduct = await this.productsModel.create({
                 title,
                 description,
+                shortDescription,
                 price,
                 images: []
             })
 
+            // todo
             for (let i = 0; i < parseCategories.length; i++) {
                  await this.categoriesProvider.createCategoryWithRel(parseCategories[i], createdProduct.id)
             }
 
             return this.response({
-                message: "Created successfully"
+                message: "Created successfully",
+                data: createdProduct
             })
         } catch (error) {
             return this.serverErrorResponse();
@@ -54,7 +58,7 @@ class ProductsService extends BaseService {
 
     async update(req) {
         try {
-            const { title, description, price, categories  } = req.body
+            const { title, description, shortDescription, price, categories  } = req.body
             const {id} = req.params
 
             const parseCategories = Array.isArray(categories) ? categories : [categories]
@@ -70,16 +74,8 @@ class ProductsService extends BaseService {
                 })
             }
 
-            if (!parseCategories?.length) {
-                return this.response({
-                    status: false,
-                    statusCode: 400,
-                    message: "Category is required"
-                })
-            }
-
             // delete all categories where products id is match
-            await products_Category.destroy({
+            await this.productsCategoriesModel.destroy({
                 where: { productId: id}
             })
 
@@ -91,9 +87,10 @@ class ProductsService extends BaseService {
             // edit image
             // image = req.file ? await this.storageService.uploadImage(req.file) : products.image
 
-            await this.productsModel.update({
+            const updatedProduct = await this.productsModel.update({
                 title,
                 description,
+                shortDescription,
                 price,
                 images: []
             },  {
@@ -101,7 +98,7 @@ class ProductsService extends BaseService {
             })
 
             return this.response({
-                message: "products successfully edited"
+                message: "Product successfully updated"
             })
         } catch (error) {
             return this.serverErrorResponse()
@@ -110,8 +107,8 @@ class ProductsService extends BaseService {
 
     async get(req) {
         try {
-            const {category, page, limit} = req.query;
-            let products = products = await this.productsProvider.findAll({ page, limit })
+            const {page, limit} = req.query;
+            let products  = await this.productsProvider.findAll({ page, limit })
                 
             return this.response({
                 data: products
@@ -133,9 +130,9 @@ class ProductsService extends BaseService {
                 })
             }
 
-            const products = await this.productsProvider.findById({id})
+            const product = await this.productsProvider.findById({id})
 
-            if (!products) {
+            if (!product) {
                 return this.response({
                     status: false,
                     statusCode: 404,
@@ -143,7 +140,7 @@ class ProductsService extends BaseService {
                 })
             }
 
-            return this.response({ data: products })
+            return this.response({ data: product })
         } catch (error) {
             return this.serverErrorResponse();
         }
@@ -162,26 +159,22 @@ class ProductsService extends BaseService {
             }
 
             const products = await this.productsModel.findOne({
-                where: {id},
-                include: [{
-                    model: Categories,
-                    as: 'categories'
-                }]
+                where: {id}
             })
 
             if (!products) {
                 return this.response({
                     status: false,
                     statusCode: 404,
-                    message: "products not found"
+                    message: "Product not found"
                 })
             }
 
             await this.productsModel.destroy({
-                where: {id}
+                where: { id }
             })
 
-            return this.response({message: "products deleted successfully"})
+            return this.response({message: "Product deleted successfully"})
         } catch (error) {
             return this.serverErrorResponse();
         }

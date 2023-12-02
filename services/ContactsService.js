@@ -48,7 +48,7 @@ module.exports = class extends BaseService {
 
         return this.response({
           data: {
-            contacts
+            contacts: contacts[0]
           }
         });
       }

@@ -17,7 +17,7 @@ class NewsProvider {
             include: [{
                 model: Categories,
                 as: 'categories',
-                attributes: ['id', 'category'],
+                attributes: ['id', 'name'],
                 through: {
                     attributes: []
                 }
@@ -43,7 +43,7 @@ class NewsProvider {
             include: [{
                 model: Categories,
                 as: 'categories',
-                attributes: ['id', 'category'],
+                attributes: ['id', 'name'],
                 through: {
                     attributes: []
                 }
@@ -59,12 +59,11 @@ class NewsProvider {
     }
 
     async findNewsByCategory({page, limit, category, include = true, attributes= ['id', 'title', 'text', 'image', 'createdAt']}) {
-        console.log(include)
         const parsedRel = [{
             model: Categories,
             as: 'categories',
-            where: {category: category.toLowerCase()},
-            attributes: ['id', 'category'],
+            where: {name: category.toLowerCase()},
+            attributes: ['id', 'name'],
             through: {
                 attributes: []
             }

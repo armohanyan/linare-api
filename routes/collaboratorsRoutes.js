@@ -7,7 +7,7 @@ const router = Router();
 
 router.get(
     "/",
-    collaboratorsController.show.bind(collaboratorsController)
+    collaboratorsController.showAll.bind(collaboratorsController)
 );
 
 router.get(
@@ -24,7 +24,7 @@ router.put(
 );
 
 router.delete(
-    "/",
+    "/:id",
     collaboratorsController.delete.bind(collaboratorsController)
 );
 

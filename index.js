@@ -3,12 +3,13 @@ const bodyParser = require('body-parser')
 const cors = require('cors')
 const db = require('./models')
 
-const newsRoutes = require('./routes/newsRoutes')
+const productsRoutes = require('./routes/productsRoutes')
 const authRoutes = require('./routes/authRoutes')
 const accountRoutes = require("./routes/accountRoutes");
 const testimonialsRoutes = require("./routes/testimonialsRoutes");
 const contactsRoutes = require("./routes/contactsRoutes");
 const collaboratorsRoutes = require("./routes/collaboratorsRoutes");
+const categoriesRoutes = require("./routes/categoriesRoutes");
 
 const cookies = require("cookie-parser");
 
@@ -33,11 +34,12 @@ app.use(
 );
 app.use(cookies());
 
-app.use("/api/news", newsRoutes);
+app.use("/api/products", productsRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/account", accountRoutes);
 app.use("/api/testimonials", testimonialsRoutes);
 app.use("/api/contacts", contactsRoutes);
 app.use("/api/collaborators", collaboratorsRoutes);
+app.use("/api/categories", categoriesRoutes);
 
 app.listen(port, () => console.log(`Server started on port ${port}`));

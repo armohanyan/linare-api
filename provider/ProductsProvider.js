@@ -57,7 +57,7 @@ class ProductsProvider {
         const parsedRel = [{
             model: Categories,
             as: 'categories',
-            where: { category: category.toLowerCase() },
+            where: { name: category.toLowerCase() },
             attributes: ['id', 'name', 'description'],
             through: {
                 attributes: []
@@ -78,20 +78,9 @@ class ProductsProvider {
                 attributes: []
             }
         })
-        
-        response.products = response?.rows
-        delete response.rows
 
-        if(!include) {
-            response.products.forEach(element => {
-                if (element.dataValues.categories)
-                    delete element.dataValues.categories
-                if (element.dataValues.author) 
-                    delete element.dataValues.author
-            });
-        }   
-        
-        return response
+
+        return response?.rows.map(el => el.dataValues)
     }
 }
 

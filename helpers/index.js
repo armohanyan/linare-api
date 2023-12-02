@@ -13,6 +13,7 @@ module.exports = {
 
         return new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).getTime();
     },
+
     getLastMonthDate: () =>  {
         const now = new Date();
 
@@ -20,10 +21,10 @@ module.exports = {
     },
 
     getPreviousDay(date = new Date()) {
-    const previous = new Date(date.getTime());
-    previous.setDate(date.getDate() - 1);
+        const previous = new Date(date.getTime());
+        previous.setDate(date.getDate() - 1);
 
-    return new Date(previous).getTime();
-}
+        return new Date(previous).getTime();
+    }
 
 }

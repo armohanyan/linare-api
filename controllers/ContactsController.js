@@ -11,7 +11,7 @@ class ContactsController {
     }
 
     async show(req, res) {
-        const data = await this.contactsService.show(req);
+        const data = await this.contactsService.showAll(req);
         res.status(data.statusCode).json(data);
     }
 

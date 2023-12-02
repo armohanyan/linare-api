@@ -7,12 +7,11 @@ class CategoriesProvider {
     constructor() {}
 
     async createCategoryWithRel(category, createdProductId) {
-        const [findOrCreatedCategory] = await Categories.findOrCreate({
-            where: {category},
-            defaults: { name: category.toLowerCase()}
+        const findOrCreatedCategory = await Categories.findOne({
+            where: { name: category }
         });
 
-        if (!findOrCreatedCategory) throw new Error("Category not found")
+        if (!findOrCreatedCategory) return
 
         await Products_Categories.create({
             productId: createdProductId,

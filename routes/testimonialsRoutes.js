@@ -6,7 +6,7 @@ const router = Router();
 
 router.get(
     "/",
-    testimonialsController.show.bind(testimonialsController)
+    testimonialsController.showAll.bind(testimonialsController)
 );
 
 router.get(
@@ -23,7 +23,7 @@ router.put(
 );
 
 router.delete(
-    "/",
+    "/:id",
     testimonialsController.delete.bind(testimonialsController)
 );
 

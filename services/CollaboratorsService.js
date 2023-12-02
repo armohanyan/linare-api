@@ -120,15 +120,15 @@ module.exports = class extends BaseService {
         return this.response({
           status: false,
           statusCode: 400,
-          message: "Testimonial ID is required"
+          message: "Collaborator ID is required"
         })
       }
 
-      await this.newsModel.destroy({
+      await this.collaboratorsModel.destroy({
         where: {id}
       })
 
-      return this.response({message: "Testimonial deleted successfully"})
+      return this.response({message: "Collaborator deleted successfully"})
     } catch (error) {
       return this.serverErrorResponse();
     }

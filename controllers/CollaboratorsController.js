@@ -15,6 +15,11 @@ class CollaboratorsController {
         res.status(data.statusCode).json(data);
     }
 
+    async showAll(req, res) {
+        const data = await this.collaboratorsService.showAll(req);
+        res.status(data.statusCode).json(data);
+    }
+
     async update(req, res) {
         const data = await this.collaboratorsService.update(req);
         res.status(data.statusCode).json(data);

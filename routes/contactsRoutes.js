@@ -8,14 +8,12 @@ router.get(
     "/",
     contactsController.show.bind(contactsController)
 );
-router.get(
-    "/:id",
-    contactsController.show.bind(contactsController)
-);
+
 router.post(
     "/",
     contactsController.create.bind(contactsController)
 );
+
 router.put(
     "/",
     contactsController.update.bind(contactsController)

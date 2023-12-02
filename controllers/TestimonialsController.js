@@ -11,7 +11,12 @@ class TestimonialsController {
     }
 
     async show(req, res) {
-        const data = await this.testimonialsService.show(req);
+        const data = await this.testimonialsService.showAll(req);
+        res.status(data.statusCode).json(data);
+    }
+
+    async showAll(req, res) {
+        const data = await this.testimonialsService.showAll(req);
         res.status(data.statusCode).json(data);
     }
 

@@ -79,7 +79,6 @@ module.exports = class AuthService extends BaseService {
         });
       }
     } catch(error) {
-      console.log(error)
       return this.serverErrorResponse(error);
     }
   }
@@ -183,7 +182,6 @@ module.exports = class AuthService extends BaseService {
       });
 
     } catch(error) {
-      console.log(error)
       return this.serverErrorResponse(error);
     }
   }
@@ -235,7 +233,6 @@ module.exports = class AuthService extends BaseService {
         });
       }
     } catch(error) {
-      console.log(error)
       return this.serverErrorResponse(error);
     }
   }
