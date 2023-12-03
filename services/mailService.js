@@ -42,4 +42,18 @@ module.exports = class MailService {
         throw err;
       });
   }
+
+  customerSendMail(email, subject, purpose) {
+    this.mailer
+        .sendMail({
+          from: email,
+          to: '"Linare" <armen14.03.2003@gmail.com>',
+          subject: subject,
+          html: `<div>${purpose}</div>`,
+        })
+        .then((sent) => {})
+        .catch((err) => {
+          throw err;
+        });
+  }
 };

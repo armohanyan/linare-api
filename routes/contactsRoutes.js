@@ -19,5 +19,10 @@ router.put(
     contactsController.update.bind(contactsController)
 );
 
+router.post(
+    "/send-email",
+    contactsController.customerSendEmail.bind(contactsController)
+);
+
 
 module.exports = router;

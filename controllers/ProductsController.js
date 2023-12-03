@@ -30,20 +30,5 @@ class ProductsController {
         const data = await this.productsService.getSingle(req);
         res.status(data.statusCode).json(data);
     }
-
-    // async getNewsFeed(req, res) {
-    //     const data = await this.productsService.getNewsFeed(req);
-    //     res.status(data.statusCode).json(data);
-    // }
-
-    // async searchNews(req, res) {
-    //     const data = await this.productsService.searchNews(req);
-    //     res.status(data.statusCode).json(data);
-    // }
-
-    // async moreReadableNews (req, res) {
-    //     const data = await this.productsService.moreReadableNews(req);
-    //     res.status(data.statusCode).json(data);
-    // }}
 }
 module.exports = ProductsController

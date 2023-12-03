@@ -2,6 +2,8 @@
 const fs = require('fs');
 const BaseService = require("./BaseService");
 const {Contacts} = require("../models");
+const MailService = require("./mailService");
+const mailService = new MailService();
 
 module.exports = class extends BaseService {
   constructor() {
@@ -107,6 +109,29 @@ module.exports = class extends BaseService {
 
       return this.response({
         message: 'Contacts updated successfully'
+      });
+
+    } catch(error) {
+      return this.serverErrorResponse(error);
+    }
+  }
+
+  sendEmail(req) {
+    try {
+      const { name, email, phone, comment } = req.body
+
+      if (!(email || comment)) {
+         return this.response({
+          status: false,
+          statusCode: 400,
+          message: 'name email and comments are required'
+        });
+      }
+
+      mailService.customerSendMail(email, `Customer message | ${name} | ${email} | ${phone}`, comment)
+
+      return this.response({
+        message: 'Sent successfully'
       });
 
     } catch(error) {

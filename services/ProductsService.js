@@ -19,7 +19,7 @@ class ProductsService extends BaseService {
 
     async create(req) {
         try {
-            const { title, shortDescription, description, price, categories  } = req.body
+            const { title, shortDescription, description, price, categories, images  } = req.body
             const parseCategories = Array.isArray(categories) ? categories : [categories]
 
             if (!parseCategories?.length)  {
@@ -29,17 +29,18 @@ class ProductsService extends BaseService {
                     message: "Category is required"
                 })
             }
-
-            // if (req.file) {
-            //     image = await this.storageService.uploadImage(req.file)
-            // }
+            if (req.file) {
+                console.log(req.file, 'file')
+                // const image = await this.storageService.uploadImage(req.file)
+                // console.log(imagsse, 'image')
+            }
 
             const createdProduct = await this.productsModel.create({
                 title,
                 description,
                 shortDescription,
                 price,
-                images: []
+                images
             })
 
             // todo
@@ -58,7 +59,7 @@ class ProductsService extends BaseService {
 
     async update(req) {
         try {
-            const { title, description, shortDescription, price, categories  } = req.body
+            const { title, description, shortDescription, price, categories, images  } = req.body
             const {id} = req.params
 
             const parseCategories = Array.isArray(categories) ? categories : [categories]
@@ -92,7 +93,7 @@ class ProductsService extends BaseService {
                 description,
                 shortDescription,
                 price,
-                images: []
+                images
             },  {
                 where:  { id }
             })
@@ -107,12 +108,34 @@ class ProductsService extends BaseService {
 
     async get(req) {
         try {
-            const {page, limit} = req.query;
+            const { category, page, limit } = req.query;
+
+            console.log(category)
             let products  = await this.productsProvider.findAll({ page, limit })
-                
-            return this.response({
-                data: products
-            })
+
+            if (category) {
+                const findCategory = await this.categoriesModel.findOne({ where: { name: category }})
+
+
+                if (!findCategory) {
+                    return this.response({
+                        statusCode: 404,
+                        status: false,
+                        message: 'Category not found'
+                    })
+                }
+
+                const filteredProducts = products.products.filter(product => product.categories.some(category => category.id === findCategory.id))
+
+                return this.response({
+                    data: filteredProducts
+                })
+            } else {
+
+                return this.response({
+                    data: products
+                })
+            }
         } catch (error) {
             return this.serverErrorResponse();
         }
@@ -179,6 +202,12 @@ class ProductsService extends BaseService {
             return this.serverErrorResponse();
         }
     }
+
+
+    getProductsByCategory(req) {
+
+    }
+
 
     // async getproductsFeed(req) {
     //     try {

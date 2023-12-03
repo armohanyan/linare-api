@@ -19,6 +19,12 @@ class ContactsController {
         const data = await this.contactsService.update(req);
         res.status(data.statusCode).json(data);
     }
+
+    async customerSendEmail(req, res) {
+        const data = await this.contactsService.sendEmail(req);
+        res.status(data.statusCode).json(data);
+    }
+
 }
 
 module.exports = ContactsController

@@ -13,7 +13,7 @@ class ProductsProvider {
             order: [
                 ['createdAt', 'DESC']
             ],
-            attributes: ['id', 'title', 'description', 'images', 'price', 'createdAt'],
+            attributes: ['id', 'title', 'description', 'shortDescription', 'images', 'price', 'createdAt'],
             include: [{
                 model: Categories,
                 as: 'categories',
@@ -37,7 +37,7 @@ class ProductsProvider {
 
     async findById({id}) {
         return await Products.findByPk(id, {
-            attributes:  ['id', 'title', 'description', 'images', 'price', 'createdAt'],
+            attributes:  ['id', 'title', 'description', 'shortDescription', 'images', 'price', 'createdAt'],
             include: [{
                 model: Categories,
                 as: 'categories',
@@ -53,7 +53,7 @@ class ProductsProvider {
         })
     }
 
-    async findProductsByCategory({page, limit, category, include = true, attributes=  ['id', 'title', 'description', 'images', 'price', 'createdAt']}) {
+    async findProductsByCategory({page, limit, category, include = true, attributes=  ['id', 'title', 'description', 'shortDescription', 'images', 'price', 'createdAt']}) {
         const parsedRel = [{
             model: Categories,
             as: 'categories',
