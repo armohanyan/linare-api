@@ -1,12 +1,19 @@
 const BaseService = require("./BaseService");
 const {verifyToken} = require("../common/token");
-const {Users} = require("../models");
+const {Users, Categories, Products, Products_Categories, Contacts, Collaborators, Testimonials} = require("../models");
 
 class AccountService extends BaseService {
 
   constructor() {
     super();
     this.userModel = Users
+
+    this.categoriesModel = Categories
+    this.productsModel = Products
+    this.contactsModel = Contacts
+    this.collaboratorsModel = Collaborators
+    this.testimonialsModel = Testimonials
+
   }
 
   async current(req) {
@@ -23,7 +30,7 @@ class AccountService extends BaseService {
         });
       }
       const isValidToken = verifyToken({ token });
-      console.log(isValidToken)
+
       if (isValidToken) {
         const userId = isValidToken.id;
 
