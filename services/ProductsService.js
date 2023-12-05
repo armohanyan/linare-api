@@ -110,7 +110,6 @@ class ProductsService extends BaseService {
         try {
             const { category, page, limit } = req.query;
 
-            console.log(category)
             let products  = await this.productsProvider.findAll({ page, limit })
 
             if (category) {
@@ -128,7 +127,9 @@ class ProductsService extends BaseService {
                 const filteredProducts = products.products.filter(product => product.categories.some(category => category.id === findCategory.id))
 
                 return this.response({
-                    data: filteredProducts
+                    data: {
+                        products: filteredProducts
+                    }
                 })
             } else {
 
