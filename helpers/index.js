@@ -1,5 +1,5 @@
 module.exports = {
-    paginate: ({ currentPage = '1', pageSize = '15' }) => {
+    paginate: ({ currentPage = '1', pageSize = '10000' }) => {
         const offset = parseInt((currentPage - 1) * pageSize, 10);
         const limit = parseInt(pageSize, 10);
         return {
