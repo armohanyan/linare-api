@@ -6,9 +6,9 @@ const categoriesController = new CategoriesController();
 const router = Router();
 
 router.get("/", categoriesController.get.bind(categoriesController))
-router.post("/", upload.single("image"), categoriesController.create.bind(categoriesController));
+router.post("/", categoriesController.create.bind(categoriesController));
 router.delete('/:id', categoriesController.delete.bind(categoriesController))
-router.put('/:id', upload.single("image"), categoriesController.update.bind(categoriesController)) //adminPermission
+router.put('/:id', categoriesController.update.bind(categoriesController)) //adminPermission
 router.get('/:id', categoriesController.getSingle.bind(categoriesController))
 // router.get("/news-feed", newsController.getNewsFeed.bind(newsController));
 // router.get('/filter/search', newsController.searchNews.bind(newsController))

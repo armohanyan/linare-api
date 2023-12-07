@@ -57,7 +57,7 @@ module.exports = class AuthService extends BaseService {
       });
 
       if (createUser) {
-        const url = `verify-email?email=${email}&token=${confirmationToken}`;
+        const url = `admin/verify-email?email=${email}&token=${confirmationToken}`;
 
         mailService.sendMail(
           email,
@@ -167,7 +167,7 @@ module.exports = class AuthService extends BaseService {
         where: { email }
       })
 
-      const url = `verify-email?email=${email}&token=${confirmationToken}`;
+      const url = `admin/verify-email?email=${email}&token=${confirmationToken}`;
 
       mailService.sendMail(
           email,
@@ -256,7 +256,7 @@ module.exports = class AuthService extends BaseService {
           }
         });
 
-        const url = `verify-email?email=${email}&token=${confirmationToken}`;
+        const url = `admin/verify-email?email=${email}&token=${confirmationToken}`;
 
         await this.userModel.update({
           confirmationToken

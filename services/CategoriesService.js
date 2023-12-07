@@ -21,6 +21,13 @@ class CategoriesService extends BaseService {
         try {
             const { name, description, parentCategoryName  } = req.body
 
+            if (!name) {
+                return this.response({
+                    status: false,
+                    statusCode: 400,
+                    message: "Category name is required"
+                })
+            }
             const parentCategory =  parentCategoryName ? await this.categoriesModel.findOne({ where: {
                     name: parentCategoryName
                 }}) : undefined
