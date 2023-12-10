@@ -12,5 +12,19 @@ router.get(
     adminController.statics.bind(adminController)
 )
 
+router.put(
+    "/",
+    adminController.update.bind(adminController)
+)
+
+router.get(
+    "/",
+    adminController.getAll.bind(adminController)
+)
+
+router.delete(
+    "/:id",
+    adminController.delete.bind(adminController)
+)
 
 module.exports = router;

@@ -11,6 +11,7 @@ const contactsRoutes = require("./routes/contactsRoutes");
 const collaboratorsRoutes = require("./routes/collaboratorsRoutes");
 const categoriesRoutes = require("./routes/categoriesRoutes");
 const adminRoutes = require("./routes/adminRoutes");
+const usersRoutes = require("./routes/usersRoutes");
 
 const cookies = require("cookie-parser");
 
@@ -43,5 +44,6 @@ app.use("/api/contacts", contactsRoutes);
 app.use("/api/collaborators", collaboratorsRoutes);
 app.use("/api/categories", categoriesRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/users", usersRoutes);
 
 app.listen(port, () => console.log(`Server started on port ${port}`));

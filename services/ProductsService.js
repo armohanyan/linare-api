@@ -4,7 +4,7 @@ const CategoriesProvider = require('../provider/CategoriesProvider')
 const ProductsProvider = require('../provider/ProductsProvider')
 const {Sequelize, Products, Categories, Authors, Products_Categories, Views} = require('../models')
 const {Op} = require("sequelize");
-const {getLastWeeksDate, getLastMonthDate, getPreviousDay} = require("../helpers");
+const {getLastWeeksDate, getLastMonthDate, getPreviousDay, paginate} = require("../helpers");
 
 class ProductsService extends BaseService {
     constructor() {
@@ -108,9 +108,9 @@ class ProductsService extends BaseService {
 
     async get(req) {
         try {
-            const { category, page, limit } = req.query;
-
-            let products  = await this.productsProvider.findAll({ page, limit })
+            const { category, sort, page, limit } = req.query;
+            const params = category ? {} : { page, limit }
+            let products  = await this.productsProvider.findAll(params)
 
             if (category) {
                 const findCategory = await this.categoriesModel.findOne({ where: { name: category }})
@@ -124,11 +124,18 @@ class ProductsService extends BaseService {
                     })
                 }
 
+
+                const paginateParams = paginate({
+                    currentPage: page,
+                    pageSize: limit
+                })
+
                 const filteredProducts = products.products.filter(product => product.categories.some(category => category.id === findCategory.id))
 
                 return this.response({
                     data: {
-                        products: filteredProducts
+                        products: filteredProducts.slice(paginateParams.offset, paginateParams.offset + paginateParams.limit),
+                        count: filteredProducts.length
                     }
                 })
             } else {
@@ -138,6 +145,8 @@ class ProductsService extends BaseService {
                 })
             }
         } catch (error) {
+
+            console.log(error, 'error')
             return this.serverErrorResponse();
         }
     }

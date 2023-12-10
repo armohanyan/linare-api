@@ -7,13 +7,11 @@ class AccountService extends BaseService {
   constructor() {
     super();
     this.userModel = Users
-
     this.categoriesModel = Categories
     this.productsModel = Products
     this.contactsModel = Contacts
     this.collaboratorsModel = Collaborators
     this.testimonialsModel = Testimonials
-
   }
 
   async current(req) {

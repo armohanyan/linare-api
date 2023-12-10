@@ -11,11 +11,4 @@ router.get(
     accountController.current.bind(accountController)
 );
 
-
-router.get(
-    "/current",
-    accountController.current.bind(accountController)
-)
-
-
 module.exports = router;
