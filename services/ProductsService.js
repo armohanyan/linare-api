@@ -29,6 +29,7 @@ class ProductsService extends BaseService {
                     message: "Category is required"
                 })
             }
+
             if (req.file) {
                 console.log(req.file, 'file')
                 // const image = await this.storageService.uploadImage(req.file)
@@ -65,6 +66,9 @@ class ProductsService extends BaseService {
             const parseCategories = Array.isArray(categories) ? categories : [categories]
             let image;
 
+            console.log(req.body)
+                console.log(req.files, 'files')
+                console.log(req.file, 'file')
             const product = await this.productsProvider.findById({id})
 
             if(!product) {

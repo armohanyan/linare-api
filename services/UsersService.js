@@ -57,7 +57,7 @@ class AccountService extends BaseService {
 
       const err = this.handleErrors(req);
 
-      if(err.hasErrors) {
+      if (err.hasErrors) {
         return err.body;
       }
 
@@ -99,9 +99,15 @@ class AccountService extends BaseService {
       const params = req.body
 
       const err = this.handleErrors(req);
+      if (err.hasErrors) {
+        console.log(err)
+        if (err.body.validationError.property !== 'password') {
+          return err.body;
+        }
 
-      if(err.hasErrors) {
-        return err.body;
+        if (params.password) {
+          return err.body
+        }
       }
 
       if (!params.id) {
@@ -112,7 +118,8 @@ class AccountService extends BaseService {
         })
       }
 
-      const hashedPassword = await hash(params.password, 10)
+      const user  = await this.userModel.findByPk(params.id)
+      const hashedPassword = params.password  ? await hash(params.password, 10) : user.password
 
       await this.userModel.update({
         ...params,

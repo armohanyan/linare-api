@@ -80,9 +80,7 @@ module.exports = class extends BaseService {
 
   async update(req) {
     try {
-
       const { id, name, logo, description } = req.body;
-
 
       if(!id) {
         return this.response({

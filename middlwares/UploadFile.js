@@ -1,18 +1,16 @@
 const Multer = require("multer");
 
 const imageFilter = (req, file, cb) => {
-    if (file.mimetype.startsWith("image")) {
+    if (file.mimetype === "image/png" || file.mimetype === "image/jpg" || file.mimetype === "image/jpeg") {
         cb(null, true);
     } else {
-        cb("Please upload only images.", false);
+        cb(null, false);
+        return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
     }
 };
 
 const uploadFile = Multer({
     storage: Multer.memoryStorage(),
-    limits: {
-        fileSize: process.env.MULTER_LIMIT_SIZE
-    },
     fileFilter: imageFilter
 })
 

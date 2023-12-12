@@ -46,6 +46,7 @@ class AccountService extends BaseService {
         return this.response({
           data: {
             currentAccount: {
+              id: user.id,
               firstName: user.firstName,
               lastName: user.lastName,
               email: user.email,

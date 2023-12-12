@@ -8,13 +8,9 @@ const adminPermission = (req, res, next) => {
 
     if (token) {
         try {
-            const { email } = jwt.verify(token, process.env.JWT_SECRET, {
+            jwt.verify(token, process.env.JWT_SECRET, {
                 algorithms: ["HS256"],
             });
-
-            if (email !== process.env.ADMIN_EMAIL) {
-                res.status(401).send("Unauthorized");
-            }
 
             next();
         } catch (err) {
