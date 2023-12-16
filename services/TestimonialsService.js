@@ -1,32 +1,30 @@
-const fs = require('fs');
 const BaseService = require("./BaseService");
 const {Sequelize, Testimonials, Authors, Categories} = require('../models')
+const StorageService = require("./StorageService");
 
-/*
-*  const createdNews = await this.newsModel.create({
-                title,
-                text,
-                image,
-                icon,
-                imageAlt: handleImageAlt,
-                authorId: newsAuthor?.id,
-                iframe
-            })*/
 module.exports = class extends BaseService {
   constructor() {
     super();
     this.testimonialsModel = Testimonials
+    this.storageService = new StorageService()
   }
 
   async create(req) {
     try {
-      const { position, comment, avatar } = req.body;
+      const { position, comment } = req.body;
 
       const  params =  {
-        position, comment, avatar
+        position, comment,
       }
 
-      const testimonial = await this.testimonialsModel.create(params);
+      const avatar = req.file ? await this.storageService.uploadImage(req.file) : null
+
+      const testimonial = await this.testimonialsModel.create({
+        ...params,
+        avatar
+      });
+
+
 
       return this.response({
         statusCode: 201,
@@ -36,6 +34,7 @@ module.exports = class extends BaseService {
       });
 
     } catch(error) {
+      console.log(error)
       return this.serverErrorResponse(error);
     }
   }

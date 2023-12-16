@@ -128,6 +128,8 @@ module.exports = class extends BaseService {
         });
       }
 
+      console.log(email, 'email')
+
       mailService.customerSendMail(email, `Customer message | ${name} | ${email} | ${phone}`, comment)
 
       return this.response({
