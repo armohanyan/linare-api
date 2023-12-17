@@ -24,8 +24,6 @@ module.exports = class extends BaseService {
         avatar
       });
 
-
-
       return this.response({
         statusCode: 201,
         data: {
@@ -34,7 +32,6 @@ module.exports = class extends BaseService {
       });
 
     } catch(error) {
-      console.log(error)
       return this.serverErrorResponse(error);
     }
   }
@@ -43,7 +40,7 @@ module.exports = class extends BaseService {
     try {
       const { id } = req.params;
 
-      if(id) {
+      if (id) {
         const testimonial = await this.testimonialsModel.findOne({ where: { id: id } } );
 
         if(!testimonial) {
@@ -89,10 +86,10 @@ module.exports = class extends BaseService {
   async update(req) {
     try {
 
-      const { id, position, comment, avatar } = req.body;
+      const { id, position, comment } = req.body;
 
 
-      if(!id) {
+      if (!id) {
         return this.response({
           status: false,
           statusCode: 400,
@@ -101,6 +98,8 @@ module.exports = class extends BaseService {
       }
 
       const testimonial = await this.testimonialsModel.findOne({ where: { id } } );
+
+      const avatar = req.file ? await this.storageService.uploadImage(req.file) : (testimonial?.avatar || null)
 
       await this.testimonialsModel.update({
         ...testimonial,
@@ -130,6 +129,12 @@ module.exports = class extends BaseService {
           statusCode: 400,
           message: "Testimonial ID is required"
         })
+      }
+
+      const testimonial = await this.testimonialsModel.findByPk(id)
+
+      if (testimonial?.avatar) {
+        await this.storageService.deleteImage(testimonial.avatar)
       }
 
       await this.testimonialsModel.destroy({

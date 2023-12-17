@@ -19,7 +19,7 @@ class ProductsService extends BaseService {
 
     async create(req) {
         try {
-            const { title, shortDescription, description, price, categories, images  } = req.body
+            const { title, shortDescription, description, price, categories  } = req.body
             const parseCategories = Array.isArray(categories) ? categories : [categories]
 
             if (!parseCategories?.length)  {
@@ -30,10 +30,18 @@ class ProductsService extends BaseService {
                 })
             }
 
-            if (req.file) {
-                console.log(req.file, 'file')
-                // const image = await this.storageService.uploadImage(req.file)
-                // console.log(imagsse, 'image')
+
+            // edit image
+            const images = []
+
+            if (req.files && req.files.length) {
+                console.log(req.files)
+                for (const file of req.files) {
+                    console.log(file, 'file')
+                    const url  = await this.storageService.uploadImage(file)
+
+                    images.push(url)
+                }
             }
 
             const createdProduct = await this.productsModel.create({
@@ -44,7 +52,6 @@ class ProductsService extends BaseService {
                 images
             })
 
-            // todo
             for (let i = 0; i < parseCategories.length; i++) {
                  await this.categoriesProvider.createCategoryWithRel(parseCategories[i], createdProduct.id)
             }
@@ -54,13 +61,14 @@ class ProductsService extends BaseService {
                 data: createdProduct
             })
         } catch (error) {
+            console.log(error)
             return this.serverErrorResponse();
         }
     }
 
     async update(req) {
         try {
-            const { title, description, shortDescription, price, categories, images  } = req.body
+            const { title, description, shortDescription, price, categories  } = req.body
             const {id} = req.params
 
             const parseCategories = Array.isArray(categories) ? categories : [categories]
@@ -87,14 +95,23 @@ class ProductsService extends BaseService {
             }
 
             // edit image
-            // image = req.file ? await this.storageService.uploadImage(req.file) : products.image
+            const images = []
 
-            const updatedProduct = await this.productsModel.update({
+            console.log(req.files)
+            if (req.files && req.files.length) {
+                for (const file in req.files) {
+                    const url  = await this.storageService.uploadImage(req.file)
+
+                    images.push(url)
+                }
+            }
+
+            await this.productsModel.update({
                 title,
                 description,
                 shortDescription,
                 price,
-                images
+                images: JSON.stringify(images)
             },  {
                 where:  { id }
             })
@@ -146,8 +163,6 @@ class ProductsService extends BaseService {
                 })
             }
         } catch (error) {
-
-            console.log(error, 'error')
             return this.serverErrorResponse();
         }
     }
@@ -192,9 +207,14 @@ class ProductsService extends BaseService {
                 })
             }
 
-            const products = await this.productsModel.findOne({
-                where: {id}
-            })
+            const products = await this.productsModel.findByPk(id)
+
+
+            if (products?.images && products?.images) {
+                for (const image of products.images) {
+                    await this.storageService.deleteImage(image)
+                }
+            }
 
             if (!products) {
                 return this.response({

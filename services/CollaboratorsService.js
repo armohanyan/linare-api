@@ -1,22 +1,30 @@
 const fs = require('fs');
 const BaseService = require("./BaseService");
 const {Collaborators} = require("../models");
+const StorageService = require("./StorageService");
 
 module.exports = class extends BaseService {
   constructor() {
     super();
     this.collaboratorsModel = Collaborators
+    this.storageService = new StorageService()
   }
 
   async create(req) {
     try {
-      const { name, logo, description } = req.body;
+      const { name, description } = req.body;
 
       const  params =  {
-        name, logo, description
+        name,
+        description
       }
 
-      const collaborator = await this.collaboratorsModel.create(params);
+      const logo = req.file ? await this.storageService.uploadImage(req.file) : null
+
+      const collaborator = await this.collaboratorsModel.create({
+        ...params,
+        logo
+      });
 
       return this.response({
         statusCode: 201,
@@ -53,7 +61,7 @@ module.exports = class extends BaseService {
       if(id) {
         const collaborator = await this.collaboratorsModel.findOne({ where: { id } } );
 
-        if(!collaborator) {
+        if (!collaborator) {
           return this.response({
             status: false,
             statusCode: 400,
@@ -80,7 +88,7 @@ module.exports = class extends BaseService {
 
   async update(req) {
     try {
-      const { id, name, logo, description } = req.body;
+      const { id, name, description } = req.body;
 
       if(!id) {
         return this.response({
@@ -91,6 +99,8 @@ module.exports = class extends BaseService {
       }
 
       const collaborator = await this.collaboratorsModel.findOne({ where: { id } } );
+
+      const logo = req.file ? await this.storageService.uploadImage(req.file) : (collaborator?.logo || null)
 
       await this.collaboratorsModel.update({
         ...collaborator,
@@ -120,6 +130,12 @@ module.exports = class extends BaseService {
           statusCode: 400,
           message: "Collaborator ID is required"
         })
+      }
+
+      const collaborator = await this.collaboratorsModel.findByPk(id)
+
+      if (collaborator?.logo) {
+        await this.storageService.deleteImage(collaborator.logo)
       }
 
       await this.collaboratorsModel.destroy({

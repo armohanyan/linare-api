@@ -21,7 +21,12 @@ module.exports = (sequelize, DataTypes) => {
     title: DataTypes.STRING,
     shortDescription: DataTypes.TEXT,
     price: DataTypes.STRING,
-    images: DataTypes.JSON,
+    images: {
+      type: DataTypes.TEXT,
+      set: function(value) {
+        return this.setDataValue("images", JSON.stringify(value || []));
+      }
+    },
     description: DataTypes.TEXT,
   }, {
     sequelize,

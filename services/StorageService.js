@@ -15,11 +15,14 @@ class StorageService {
         return new Promise((resolve, reject) => {
             const { originalname, buffer } = file
 
-            const blob = this.bucket.file(originalname.replace(/ /g, "_"))
+            const ext =  originalname.split('.').at(-1)
+            const filename = new Date().getTime() + '.' + ext
+            const blob = this.bucket.file(filename)
             const blobStream = blob.createWriteStream()
+
             blobStream.on('finish', () => {
                 const publicUrl = format(
-                    `https://storage.googleapis.com/${this.bucket.name}/${blob.name}`
+                    `https://storage.googleapis.com/${this.bucket.name}/${filename}`
                 )
 
                 resolve(publicUrl)
@@ -29,6 +32,16 @@ class StorageService {
                 })
                 .end(buffer)
         })
+    }
+
+    async deleteImage(path) {
+        try {
+            const filename  = path.split('/').at(-1)
+            await this.storage.bucket(this.bucket.name).file(filename).delete();
+        } catch (e) {
+            console.log(e)
+        }
+
     }
 }
 
