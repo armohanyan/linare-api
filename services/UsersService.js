@@ -68,7 +68,7 @@ class AccountService extends BaseService {
       if (user) {
         return this.response({
           status: false,
-          statusCode: 409,
+          statusCode: 400,
           message: 'User already registered'
         });
       }
@@ -100,7 +100,7 @@ class AccountService extends BaseService {
 
       const err = this.handleErrors(req);
       if (err.hasErrors) {
-        console.log(err)
+
         if (err.body.validationError.property !== 'password') {
           return err.body;
         }
@@ -108,6 +108,18 @@ class AccountService extends BaseService {
         if (params.password) {
           return err.body
         }
+      }
+
+      const existOtherUser = await this.userModel.findOne(
+          { where: { email: params.email } }
+      )
+
+      if (existOtherUser && existOtherUser.id !== params.id) {
+        return this.response({
+          status: false,
+          statusCode: 409,
+          message: 'User already registered'
+        });
       }
 
       if (!params.id) {

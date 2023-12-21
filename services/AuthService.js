@@ -320,7 +320,7 @@ module.exports = class AuthService extends BaseService {
       })
 
       if (updateUserConfirmationToken) {
-        const url = `reset-password?email=${email}&token=${confirmationToken}`;
+        const url = `admin/reset-password?email=${email}&token=${confirmationToken}`;
 
         mailService.sendMail(
           email,
@@ -368,11 +368,10 @@ module.exports = class AuthService extends BaseService {
             message: "User does not found"
           });
         }
-
-        const hashedPassword = bcrypt.hash(password, 10)
+        const hashedPassword = await bcrypt.hash(password, 10)
 
         const resetUserPassword = await this.userModel.update({
-          hashedPassword,
+          password: hashedPassword,
           confirmationToken: null
         },  {
           where: { email }
@@ -393,6 +392,7 @@ module.exports = class AuthService extends BaseService {
         });
       }
     } catch(error) {
+      console.log(error)
       return this.serverErrorResponse(error)
     }
   }
