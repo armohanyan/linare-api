@@ -94,24 +94,11 @@ class ProductsService extends BaseService {
                 await this.categoriesProvider.createCategoryWithRel(parseCategories[i], id)
             }
 
-            // edit image
-            const images = []
-
-            console.log(req.files)
-            if (req.files && req.files.length) {
-                for (const file in req.files) {
-                    const url  = await this.storageService.uploadImage(req.file)
-
-                    images.push(url)
-                }
-            }
-
             await this.productsModel.update({
                 title,
                 description,
                 shortDescription,
                 price,
-                images: JSON.stringify(images)
             },  {
                 where:  { id }
             })
